@@ -2,12 +2,15 @@
     <div>
         <div class="container">
             <div class="row justify-content-center">
+                <div class="row justify-content-end">
+                    <div class="col-md-2">
+                        <!-- Add Employee Button -->
+                        <button class="btn btn-primary mb-3" @click="toggleForm">
+                            {{ showForm ? 'Close Form' : 'Add Employee' }}
+                        </button>
+                    </div>
+                </div>
                 <div class="col-md-4">
-                    <!-- Add Employee Button -->
-                    <button class="btn btn-primary mb-3" @click="toggleForm">
-                        {{ showForm ? 'Close Form' : 'Add Employee' }}
-                    </button>
-
                     <!-- Add Employee Form -->
                     <div v-if="showForm" class="card m-2">
                         <div class="card-header">
@@ -34,18 +37,14 @@
                     </div>
                 </div>
 
-                <div class="col-md-8">
+                <div v-if="showList" class="col-md-12">
                     <!-- Search and Employee List -->
                     <div class="card m-2">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span>List Employees</span>
-                                <input
-                                    type="text"
-                                    v-model="searchQuery"
-                                    class="form-control w-50"
-                                    placeholder="Search by name, phone, or address"
-                                />
+                                <input type="text" v-model="searchQuery" class="form-control w-50"
+                                    placeholder="Search by name, phone, or address" />
                             </div>
                         </div>
                         <div class="card-body">
@@ -64,16 +63,11 @@
                                         <td>{{ employee.phone }}</td>
                                         <td>{{ employee.address }}</td>
                                         <td>
-                                            <button
-                                                class="btn btn-warning btn-sm m-1"
-                                                @click="editEmployee(employee)"
-                                            >
+                                            <button class="btn btn-warning btn-sm m-1" @click="editEmployee(employee)">
                                                 Edit
                                             </button>
-                                            <button
-                                                class="btn btn-danger btn-sm m-1"
-                                                @click="deleteEmployee(employee.id)"
-                                            >
+                                            <button class="btn btn-danger btn-sm m-1"
+                                                @click="deleteEmployee(employee.id)">
                                                 Delete
                                             </button>
                                         </td>
@@ -85,28 +79,18 @@
                             <nav v-if="pagination" aria-label="Page navigation">
                                 <ul class="pagination justify-content-center">
                                     <li class="page-item" :class="{ disabled: !pagination.prev_page_url }">
-                                        <button
-                                            class="page-link"
-                                            @click="fetchEmployees(pagination.current_page - 1)"
-                                            :disabled="!pagination.prev_page_url"
-                                        >
+                                        <button class="page-link" @click="fetchEmployees(pagination.current_page - 1)"
+                                            :disabled="!pagination.prev_page_url">
                                             Previous
                                         </button>
                                     </li>
-                                    <li
-                                        class="page-item"
-                                        v-for="page in totalPages"
-                                        :key="page"
-                                        :class="{ active: page === pagination.current_page }"
-                                    >
+                                    <li class="page-item" v-for="page in totalPages" :key="page"
+                                        :class="{ active: page === pagination.current_page }">
                                         <button class="page-link" @click="fetchEmployees(page)">{{ page }}</button>
                                     </li>
                                     <li class="page-item" :class="{ disabled: !pagination.next_page_url }">
-                                        <button
-                                            class="page-link"
-                                            @click="fetchEmployees(pagination.current_page + 1)"
-                                            :disabled="!pagination.next_page_url"
-                                        >
+                                        <button class="page-link" @click="fetchEmployees(pagination.current_page + 1)"
+                                            :disabled="!pagination.next_page_url">
                                             Next
                                         </button>
                                     </li>
@@ -136,9 +120,11 @@ export default {
             searchQuery: '',
             isEditing: false,
             currentEmployeeId: null,
-            showForm: false // Form visibility state
+            showForm: false, // Form visibility state
+            showList: true   // List visibility state
         };
     },
+
     mounted() {
         this.fetchEmployees(); // Fetch the first page of employees on mount
     },
@@ -169,6 +155,8 @@ export default {
     methods: {
         toggleForm() {
             this.showForm = !this.showForm;
+            this.showList = !this.showForm; // Hide the list when form is visible, show it otherwise
+
             if (!this.showForm) {
                 this.resetForm(); // Reset the form when closing
             }
@@ -244,6 +232,3 @@ export default {
     }
 };
 </script>
-
-
-

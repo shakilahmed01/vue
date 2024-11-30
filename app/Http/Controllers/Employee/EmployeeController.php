@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Employee;
 
 use App\Http\Controllers\Controller;
 use App\Models\Employee; // Correct namespace for Employee model
+use App\Models\EmployeePosition;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
@@ -66,5 +67,22 @@ class EmployeeController extends Controller
         $employee->delete();
 
         return response()->json(['message' => 'Employee deleted successfully!']);
+    }
+
+    //position function begin
+
+    public function addPosition(Request $request)
+    {
+        $request->validate([
+            'em_id' => 'required',
+            'name' => 'required|string|max:255',
+        ]);
+
+        $position = new EmployeePosition();
+        $position->em_id = $request->em_id;
+        $position->name = $request->name;
+        $position->save();
+
+        return response()->json(['message' => 'Employee Position created successfully!'], 201);
     }
 }
