@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
+    public function home()
+    {
+        $pageTitle = "Employee Dashboard";
+        return view('admin.employee.index', compact('pageTitle'));
+    }
     public function index(Request $request)
     {
         // Retrieve the search term from the request
