@@ -160,20 +160,32 @@ export default {
                 : [];
         }
     },
+    watch: {
+        searchQuery(newQuery) {
+            // Fetch the first page whenever the search term changes
+            this.fetchEmployees(1);
+        }
+    },
     methods: {
         toggleForm() {
             this.showForm = !this.showForm;
             if (!this.showForm) {
-                this.resetForm(); // Reset form when closing
+                this.resetForm(); // Reset the form when closing
             }
         },
         async fetchEmployees(page = 1) {
             try {
-                const response = await axios.get(`/api/employees?page=${page}`);
+                const response = await axios.get('/api/employees', {
+                    params: {
+                        page,
+                        search: this.searchQuery // Send the search query to the server
+                    }
+                });
                 this.employees = response.data.data;
                 this.pagination = response.data; // Store pagination data
             } catch (error) {
                 console.error('Error fetching employees:', error);
+                alert('Failed to fetch employees. Please try again.');
             }
         },
         async submitForm() {
@@ -187,20 +199,22 @@ export default {
             try {
                 await axios.post('/api/employees', this.form);
                 alert('Employee added successfully!');
-                this.fetchEmployees(this.pagination.current_page); // Refresh current page
+                this.fetchEmployees(this.pagination.current_page); // Refresh the current page
                 this.toggleForm(); // Close the form
             } catch (error) {
                 console.error('Error adding employee:', error);
+                alert('Failed to add employee. Please try again.');
             }
         },
         async updateEmployee() {
             try {
                 await axios.put(`/api/employees/${this.currentEmployeeId}`, this.form);
                 alert('Employee updated successfully!');
-                this.fetchEmployees(this.pagination.current_page); // Refresh current page
+                this.fetchEmployees(this.pagination.current_page); // Refresh the current page
                 this.toggleForm(); // Close the form
             } catch (error) {
                 console.error('Error updating employee:', error);
+                alert('Failed to update employee. Please try again.');
             }
         },
         editEmployee(employee) {
@@ -216,9 +230,10 @@ export default {
             try {
                 await axios.delete(`/api/employees/${id}`);
                 alert('Employee deleted successfully!');
-                this.fetchEmployees(this.pagination.current_page); // Refresh current page
+                this.fetchEmployees(this.pagination.current_page); // Refresh the current page
             } catch (error) {
                 console.error('Error deleting employee:', error);
+                alert('Failed to delete employee. Please try again.');
             }
         },
         resetForm() {
@@ -229,5 +244,6 @@ export default {
     }
 };
 </script>
+
 
 
