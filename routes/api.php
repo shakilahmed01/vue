@@ -10,6 +10,6 @@ Route::get('/user', function (Request $request) {
 
 Route::get('/employees', [EmployeeController::class, 'index']);
 Route::post('/employees', [EmployeeController::class, 'postData']);
-Route::put('/employees/{id}', [EmployeeController::class, 'update']);
+Route::post('/employees/{id}', [EmployeeController::class, 'update']);
 Route::delete('/employees/{id}', [EmployeeController::class, 'delete']);
 

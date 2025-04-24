@@ -16,18 +16,25 @@ class EmployeeController extends Controller
     }
     public function index(Request $request)
     {
-        // Retrieve the search term from the request
         $search = $request->input('search');
-
-        // Query the employees table, applying a search filter if provided
+    
         $employees = Employee::when($search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%")
                 ->orWhere('phone', 'like', "%{$search}%")
                 ->orWhere('address', 'like', "%{$search}%");
         })->paginate(10);
-
+        $employees->getCollection()->transform(function ($employee) {
+            if ($employee->image) {
+                $employee->image_url = url('' . $employee->image);
+            } else {
+                $employee->image_url = null; // No image
+            }
+            return $employee;
+        });
+    
         return response()->json($employees);
     }
+    
 
 
     public function postData(Request $request)
@@ -36,30 +43,64 @@ class EmployeeController extends Controller
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:500',
             'phone' => 'required|string|max:15',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
         ]);
-
+    
+        $imagePath = null;
+    
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images'), $imageName); 
+            $imagePath = 'images/' . $imageName; 
+        }
+    
         $employee = new Employee();
         $employee->name = $request->name;
         $employee->address = $request->address;
         $employee->phone = $request->phone;
+        $employee->image = $imagePath; // Save the public path to the database
         $employee->save();
-
-        return response()->json(['message' => 'Employee created successfully!'], 201);
+    
+        return response()->json(['message' => 'Employee created successfully!', 'image_path' => $imagePath], 201);
     }
+    
 
     public function update(Request $request, $id)
     {
-        $request->validate([
+        // Validate the incoming data
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'address' => 'required|string|max:500',
-            'phone' => 'required|string|max:15',
+            'phone' => 'required|string|max:255',
+            'address' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Optional image validation
         ]);
+        
+        $employee = Employee::findOrFail($id);
 
-        $employee = Employee::findOrFail($id); // Ensure the employee exists
-        $employee->update($request->only(['name', 'address', 'phone']));
-
-        return response()->json(['message' => 'Employee updated successfully!']);
+        if ($request->hasFile('image')) {
+            // Delete the old image
+            if ($employee->image) {
+                $oldImagePath = public_path($employee->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+        
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images'), $imageName);
+            $validated['image'] = 'images/' . $imageName; // ✅ use this path for saving
+        }
+        
+    
+        // Update the employee with the validated data
+        $employee->update($validated);
+    
+        // Return the updated employee as JSON
+        return response()->json($employee);
     }
+    
 
     public function delete($id)
     {
