@@ -5,14 +5,14 @@
                 <div class="row">
                     <div class="col-md-2">
                         <button class="btn btn-primary mb-3" @click="toggleForm">
-                            {{ showForm ? 'Back' : 'Add Employee' }}
+                            {{ showForm ? 'Back' : 'Add New' }}
                         </button>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div v-if="showForm" class="card m-2">
                         <div class="card-header">
-                            {{ isEditing ? 'Edit Employee' : 'Add Employee' }}
+                            {{ isEditing ? 'Edit' : 'Add ' }}
                         </div>
                         <div class="card-body">
                             <form @submit.prevent="submitForm">
@@ -52,7 +52,7 @@
                     <div class="card m-2">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span>List Employees</span>
+                                <span>ভাড়াটিয়াদের তালিকা</span>
                                     <input type="text" v-model="searchQuery" class="form-control w-25 " placeholder="Search by name, phone, or address" />
                             </div>
                         </div>

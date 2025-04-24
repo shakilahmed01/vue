@@ -184,7 +184,7 @@
   <li class="nav-item">
     <a class="nav-link collapsed" href="{{route('employee.home')}}">
       <i class="bi bi-person"></i>
-      <span>Employee</span>
+      <span>ভাড়াটিয়া</span>
     </a>
   </li><!-- End Profile Page Nav -->
   <li class="nav-item">

@@ -11,7 +11,7 @@ class EmployeeController extends Controller
 {
     public function home()
     {
-        $pageTitle = "Employee Dashboard";
+        $pageTitle = "ভাড়াটিয়াদের ড্যাশবোরড";
         return view('admin.employee.index', compact('pageTitle'));
     }
     public function index(Request $request)
