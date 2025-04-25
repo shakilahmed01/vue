@@ -15,8 +15,8 @@ import { createApp } from 'vue';
 
 const app = createApp({});
 
-import EmployeeComponent from './components/CustomerComponent.vue';
-app.component('customer-component', CustomerComponent);
+import RentBillComponent from './components/RentBillComponent.vue';
+app.component('rentbill-component', RentBillComponent);
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -35,4 +35,4 @@ app.component('customer-component', CustomerComponent);
  * scaffolding. Otherwise, you will need to add an element yourself.
  */
 
-app.mount('#customer');
+app.mount('#rentbill');

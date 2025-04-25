@@ -17,6 +17,13 @@
                         <div class="card-body">
                             <form @submit.prevent="submitForm">
                                 <div class="form-group">
+                                    <label class="form-label">Flat</label>
+                                    <select v-model="form.flat_id" class="form-control">
+                                        <option disabled value="">Select a Flat</option>
+                                        <option v-for="flat in flats" :key="flat.id" :value="flat.id">
+                                            {{ flat.name }}
+                                        </option>
+                                    </select>
                                     <label class="form-label">Name</label>
                                     <input type="text" v-model="form.name" class="form-control" />
 
@@ -60,6 +67,7 @@
                             <table class="table table-bordered m-2">
                                 <thead>
                                     <tr>
+                                        <th>Flat</th>
                                         <th>Name</th>
                                         <th>Phone</th>
                                         <th>Address</th>
@@ -69,6 +77,7 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="employee in filteredEmployees" :key="employee.id">
+                                        <td>{{ employee.flats?.name || 'N/A' }}</td>
                                         <td>{{ employee.name }}</td>
                                         <td>{{ employee.phone }}</td>
                                         <td>{{ employee.address }}</td>
@@ -122,6 +131,7 @@ export default {
                 address: '',
                 image: null,
                 image_url: '', // Store the image URL when editing
+                flat_id: '',
             },
             employees: [],
             pagination: null,
@@ -135,6 +145,7 @@ export default {
     },
     mounted() {
         this.fetchEmployees();
+        this.fetchFlats();
     },
     computed: {
         filteredEmployees() {
@@ -168,6 +179,14 @@ export default {
                 this.pagination = response.data;
             } catch (error) {
                 console.error('Error fetching employees:', error);
+            }
+        },
+        async fetchFlats() {
+            try {
+                const response = await axios.get('/api/flats');
+                this.flats = response.data.data; // Adjust if your data structure is different
+            } catch (error) {
+                console.error('Error fetching flats:', error);
             }
         },
         async submitForm() {
@@ -231,7 +250,8 @@ export default {
                 phone: employee.phone, 
                 address: employee.address, 
                 image_url: employee.image_url, // Ensure image URL is set for editing
-                image: null // Reset the image field for editing
+                image: null, // Reset the image field for editing
+                flat_id: employee.flat_id
             };
             if (!this.showForm) this.toggleForm();
         },

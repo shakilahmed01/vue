@@ -9,7 +9,7 @@
     </a>
   </li><!-- End Dashboard Nav -->
 
-  <li class="nav-item">
+  <!-- <li class="nav-item">
     <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
       <i class="bi bi-menu-button-wide"></i><span>Components</span><i class="bi bi-chevron-down ms-auto"></i>
     </a>
@@ -87,7 +87,7 @@
     </ul>
   </li><!-- End Components Nav -->
 
-  <li class="nav-item">
+  <!-- <li class="nav-item">
     <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
       <i class="bi bi-journal-text"></i><span>Forms</span><i class="bi bi-chevron-down ms-auto"></i>
     </a>
@@ -112,10 +112,10 @@
           <i class="bi bi-circle"></i><span>Form Validation</span>
         </a>
       </li>
-    </ul>
+    </ul> -->
   </li><!-- End Forms Nav -->
 
-  <li class="nav-item">
+  <!-- <li class="nav-item">
     <a class="nav-link collapsed" data-bs-target="#tables-nav" data-bs-toggle="collapse" href="#">
       <i class="bi bi-layout-text-window-reverse"></i><span>Tables</span><i class="bi bi-chevron-down ms-auto"></i>
     </a>
@@ -131,7 +131,7 @@
         </a>
       </li>
     </ul>
-  </li><!-- End Tables Nav -->
+  </li>
 
   <li class="nav-item">
     <a class="nav-link collapsed" data-bs-target="#charts-nav" data-bs-toggle="collapse" href="#">
@@ -154,7 +154,7 @@
         </a>
       </li>
     </ul>
-  </li><!-- End Charts Nav -->
+  </li>
 
   <li class="nav-item">
     <a class="nav-link collapsed" data-bs-target="#icons-nav" data-bs-toggle="collapse" href="#">
@@ -177,8 +177,7 @@
         </a>
       </li>
     </ul>
-  </li><!-- End Icons Nav -->
-
+  </li> -->
   <li class="nav-heading">Pages</li>
 
   <li class="nav-item">
@@ -188,16 +187,16 @@
     </a>
   </li><!-- End Profile Page Nav -->
   <li class="nav-item">
-    <a class="nav-link collapsed" href="users-profile.html">
+    <a class="nav-link collapsed" href="{{route('flat.home')}}">
     <i class="bi bi-menu-button-wide"></i>
-      <span>Attendence</span>
+      <span>ফ্লাট</span>
     </a>
   </li><!-- End Profile Page Nav -->
 
   <li class="nav-item">
-    <a class="nav-link collapsed" href="pages-faq.html">
+    <a class="nav-link collapsed" href="{{route('rent.home')}}">
       <i class="bi bi-question-circle"></i>
-      <span>F.A.Q</span>
+      <span>হিসাব খাতা</span>
     </a>
   </li><!-- End F.A.Q Page Nav -->
 

@@ -18,7 +18,7 @@ class EmployeeController extends Controller
     {
         $search = $request->input('search');
     
-        $employees = Employee::when($search, function ($query, $search) {
+        $employees = Employee::with('flats')->when($search, function ($query, $search) {
             $query->where('name', 'like', "%{$search}%")
                 ->orWhere('phone', 'like', "%{$search}%")
                 ->orWhere('address', 'like', "%{$search}%");
@@ -43,6 +43,7 @@ class EmployeeController extends Controller
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:500',
             'phone' => 'required|string|max:15',
+            'flat_id' => 'required|integer|exists:flats,id',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validate image
         ]);
     
@@ -56,6 +57,7 @@ class EmployeeController extends Controller
         }
     
         $employee = new Employee();
+        $employee->flat_id = $request->flat_id;
         $employee->name = $request->name;
         $employee->address = $request->address;
         $employee->phone = $request->phone;
@@ -68,11 +70,13 @@ class EmployeeController extends Controller
 
     public function update(Request $request, $id)
     {
+        //dd($request->all());
         // Validate the incoming data
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:255',
             'address' => 'required|string|max:255',
+            'flat_id' => 'required|integer|exists:flats,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Optional image validation
         ]);
         

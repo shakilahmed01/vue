@@ -5,33 +5,20 @@
                 <div class="row">
                     <div class="col-md-2">
                         <button class="btn btn-primary mb-3" @click="toggleForm">
-                            {{ showForm ? 'Back' : 'Add customer' }}
+                            {{ showForm ? 'Back' : 'Add New' }}
                         </button>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div v-if="showForm" class="card m-2">
+                <div v-if="showForm" class="col-md-4">
+                    <div class="card m-2">
                         <div class="card-header">
-                            {{ isEditing ? 'Edit customer' : 'Add customer' }}
+                            {{ isEditing ? 'Edit' : 'Add ' }}
                         </div>
                         <div class="card-body">
                             <form @submit.prevent="submitForm">
                                 <div class="form-group">
                                     <label class="form-label">Name</label>
                                     <input type="text" v-model="form.name" class="form-control" />
-
-                                    <label class="form-label">Phone</label>
-                                    <input type="text" v-model="form.phone" class="form-control" />
-
-                                    <label class="form-label">Address</label>
-                                    <input type="text" v-model="form.address" class="form-control" />
-
-                                    <label class="form-label">Image</label>
-                                    <input type="file" ref="image" class="form-control" @change="handleImageUpload" />
-                                    <!-- Display current image if editing -->
-                                    <div v-if="isEditing && form.image_url">
-                                        <img :src="form.image_url" alt="customer Image" class="img-thumbnail" width="100" />
-                                    </div>
 
                                     <div v-if="errors.length" class="alert alert-danger mt-2">
                                         <ul>
@@ -48,12 +35,12 @@
                     </div>
                 </div>
 
-                <div v-if="showList" class="col-md-12">
+                <div v-if="showList" class="col-md-4">
                     <div class="card m-2">
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span>List customers</span>
-                                    <input type="text" v-model="searchQuery" class="form-control w-25 " placeholder="Search by name, phone, or address" />
+                                <span>ফ্লাট তালিকা</span>
+                                    <input type="text" v-model="searchQuery" class="form-control w-50" placeholder="Search by name" />
                             </div>
                         </div>
                         <div class="card-body">
@@ -61,25 +48,17 @@
                                 <thead>
                                     <tr>
                                         <th>Name</th>
-                                        <th>Phone</th>
-                                        <th>Address</th>
-                                        <th>Image</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="customer in filteredcustomers" :key="customer.id">
-                                        <td>{{ customer.name }}</td>
-                                        <td>{{ customer.phone }}</td>
-                                        <td>{{ customer.address }}</td>
+                                    <tr v-for="flat in filteredflats" :key="flat.id">
+                                        <td>{{ flat.name }}</td>
                                         <td>
-                                            <img :src="customer.image_url" alt="customer Image" class="img-thumbnail" width="100" />
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-warning btn-sm m-1" @click="editcustomer(customer)">
+                                            <button class="btn btn-warning btn-sm m-1" @click="editflat(flat)">
                                                 Edit
                                             </button>
-                                            <button class="btn btn-danger btn-sm m-1" @click="deletecustomer(customer.id)">
+                                            <button class="btn btn-danger btn-sm m-1" @click="deleteflat(flat.id)">
                                                 Delete
                                             </button>
                                         </td>
@@ -90,15 +69,15 @@
                             <nav v-if="pagination" aria-label="Page navigation">
                                 <ul class="pagination justify-content-center">
                                     <li class="page-item" :class="{ disabled: !pagination.prev_page_url }">
-                                        <button class="page-link" @click="fetchcustomers(pagination.current_page - 1)" :disabled="!pagination.prev_page_url">
+                                        <button class="page-link" @click="fetchflats(pagination.current_page - 1)" :disabled="!pagination.prev_page_url">
                                             Previous
                                         </button>
                                     </li>
                                     <li class="page-item" v-for="page in totalPages" :key="page" :class="{ active: page === pagination.current_page }">
-                                        <button class="page-link" @click="fetchcustomers(page)">{{ page }}</button>
+                                        <button class="page-link" @click="fetchflats(page)">{{ page }}</button>
                                     </li>
                                     <li class="page-item" :class="{ disabled: !pagination.next_page_url }">
-                                        <button class="page-link" @click="fetchcustomers(pagination.current_page + 1)" :disabled="!pagination.next_page_url">
+                                        <button class="page-link" @click="fetchflats(pagination.current_page + 1)" :disabled="!pagination.next_page_url">
                                             Next
                                         </button>
                                     </li>
@@ -118,32 +97,26 @@ export default {
         return {
             form: {
                 name: '',
-                phone: '',
-                address: '',
-                image: null,
-                image_url: '', // Store the image URL when editing
             },
-            customers: [],
+            flats: [],
             pagination: null,
             searchQuery: '',
             isEditing: false,
-            currentcustomerId: null,
+            currentflatId: null,
             showForm: false,
             showList: true,
             errors: [],
         };
     },
     mounted() {
-        this.fetchcustomers();
+        this.fetchflats();
     },
     computed: {
-        filteredcustomers() {
-            if (!this.searchQuery) return this.customers;
+        filteredflats() {
+            if (!this.searchQuery) return this.flats;
             const query = this.searchQuery.toLowerCase();
-            return this.customers.filter(customer =>
-                customer.name.toLowerCase().includes(query) ||
-                customer.phone.toLowerCase().includes(query) ||
-                customer.address.toLowerCase().includes(query)
+            return this.flats.filter(flat =>
+                flat.name.toLowerCase().includes(query)
             );
         },
         totalPages() {
@@ -159,15 +132,15 @@ export default {
         handleImageUpload(event) {
             this.form.image = event.target.files[0];
         },
-        async fetchcustomers(page = 1) {
+        async fetchflats(page = 1) {
             try {
-                const response = await axios.get('/api/customers', {
+                const response = await axios.get('/api/flats', {
                     params: { page, search: this.searchQuery }
                 });
-                this.customers = response.data.data;
+                this.flats = response.data.data;
                 this.pagination = response.data;
             } catch (error) {
-                console.error('Error fetching customers:', error);
+                console.error('Error fetching flats:', error);
             }
         },
         async submitForm() {
@@ -194,51 +167,47 @@ export default {
 
             try {
                 if (this.isEditing) {
-                    // Update customer
-                    await axios.put(`/api/customers/${this.currentcustomerId}`, formData);
-                    alert('customer updated successfully!');
+                    // Update flat
+                    await axios.post(`/api/flats/${this.currentflatId}`, formData);
+                    alert('flat updated successfully!');
                 } else {
-                    // Create new customer
-                    await axios.post('/api/customers', formData);
-                    alert('customer added successfully!');
+                    // Create new flat
+                    await axios.post('/api/flats', formData);
+                    alert('flat added successfully!');
                 }
-                this.fetchcustomers(this.pagination.current_page);
+                this.fetchflats(this.pagination.current_page);
                 this.toggleForm();
             } catch (error) {
-                console.error('Error saving customer:', error);
+                console.error('Error saving flat:', error);
 
                 if (error.response) {
                     console.error('Response error data:', error.response.data);
-                    this.errors = error.response.data.errors || ['Failed to save customer.'];
+                    this.errors = error.response.data.errors || ['Failed to save flat.'];
                 }
             }
         },
-        async deletecustomer(id) {
-            if (!confirm('Are you sure you want to delete this customer?')) return;
+        async deleteflat(id) {
+            if (!confirm('Are you sure you want to delete this flat?')) return;
             try {
-                await axios.delete(`/api/customers/${id}`);
-                alert('customer deleted successfully!');
-                this.fetchcustomers(this.pagination.current_page);
+                await axios.delete(`/api/flats/${id}`);
+                alert('flat deleted successfully!');
+                this.fetchflats(this.pagination.current_page);
             } catch (error) {
-                console.error('Error deleting customer:', error);
+                console.error('Error deleting flat:', error);
             }
         },
-        editcustomer(customer) {
+        editflat(flat) {
             this.isEditing = true;
-            this.currentcustomerId = customer.id;
+            this.currentflatId = flat.id;
             this.form = { 
-                name: customer.name, 
-                phone: customer.phone, 
-                address: customer.address, 
-                image_url: customer.image_url, // Ensure image URL is set for editing
-                image: null // Reset the image field for editing
+                name: flat.name, 
             };
             if (!this.showForm) this.toggleForm();
         },
         resetForm() {
-            this.form = { name: '', phone: '', address: '', image: null, image_url: '' };
+            this.form = { name: '' };
             this.isEditing = false;
-            this.currentcustomerId = null;
+            this.currentflatId = null;
             this.errors = [];
         }
     }
