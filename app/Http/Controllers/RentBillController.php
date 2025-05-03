@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\RentBill;
+use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class RentBillController extends Controller
 {
@@ -46,6 +48,7 @@ class RentBillController extends Controller
             ($validated['flat_rent'] ?? 0) +
             ($validated['electric_bill'] ?? 0) +
             ($validated['gas_bill'] ?? 0) +
+            ($validated['garbase_bill'] ?? 0) +
             ($validated['water_bill'] ?? 0);
         $validated['due'] = $validated['grand_total'] - ($validated['payment'] ?? 0);
         $validated['due'] = $validated['due'] + ($validated['past_due'] ?? 0);
@@ -65,26 +68,54 @@ class RentBillController extends Controller
             'electric_bill' => 'required|integer',
             'gas_bill' => 'nullable|integer',
             'water_bill' => 'required|integer',
-            'garbase_bill' => 'nullable|integer',
+            'garbase_bill' => 'nullable|integer', // Fixed typo
             'past_due' => 'nullable|integer',
             'payment' => 'nullable|integer',
             'note' => 'nullable|string|max:500',
-
-
         ]);
-
-        $validated['grand_total'] =
-            ($validated['flat_rent'] ?? 0) +
-            ($validated['electric_bill'] ?? 0) +
-            ($validated['gas_bill'] ?? 0) +
-            ($validated['water_bill'] ?? 0);
-        $validated['due'] = $validated['grand_total'] - ($validated['payment'] ?? 0);
-        $validated['due'] = $validated['due'] + ($validated['past_due'] ?? 0);
-
-        $rentBill = RentBill::findOrFail($id);
-        $rentBill->update($validated);
-
-        return response()->json(['message' => 'Rent bill updated successfully!', 'data' => $rentBill]);
+    
+        DB::beginTransaction();
+    
+        try {
+            // Ensure defaults
+            $validated['gas_bill'] = $validated['gas_bill'] ?? 0;
+            $validated['garbase_bill'] = $validated['garbase_bill'] ?? 0;
+            $validated['past_due'] = $validated['past_due'] ?? 0;
+            $validated['payment'] = $validated['payment'] ?? 0;
+    
+            // Calculate totals
+            $validated['grand_total'] =
+                $validated['flat_rent'] +
+                $validated['electric_bill'] +
+                $validated['gas_bill'] +
+                $validated['garbase_bill'] +
+                $validated['water_bill'];
+    
+            // If due_payment is present, add it to validated['payment']
+            $duePaymentAmount = is_numeric($request->due_payment) ? (float) $request->due_payment : 0;
+            if ($duePaymentAmount > 0) {
+                $validated['payment'] += $duePaymentAmount;
+            
+                Payment::create([
+                    'user_id' => $validated['user_id'],
+                    'due_payment' => $duePaymentAmount,
+                ]);
+            }
+    
+            $validated['due'] = $validated['grand_total'] - $validated['payment'] + $validated['past_due'];
+    
+            // Update rent bill
+            $rentBill = RentBill::findOrFail($id);
+            $rentBill->update($validated);
+    
+            DB::commit();
+    
+            return response()->json(['message' => 'Rent bill updated successfully!', 'data' => $rentBill]);
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Failed to update rent bill.', 'details' => $e->getMessage()], 500);
+        }
     }
 
 

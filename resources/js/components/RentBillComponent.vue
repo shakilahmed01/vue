@@ -78,6 +78,11 @@
                                             <label class="form-label">Note</label>
                                             <textarea type="text" v-model="form.note" class="form-control"></textarea>
                                         </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label">Due Payment</label>
+                                            <input type="number" v-model="form.due_payment" class="form-control" />
+                                        </div>
                                     </div>
 
                                     <div v-if="errors.length" class="alert alert-danger mt-2">
@@ -115,6 +120,7 @@
                                         <th>Gas Bill</th>
                                         <th>Electric Bill</th>
                                         <th>Water Bill</th>
+                                        <th>Garbase Bill</th>
                                         <th>Grand Total</th>
                                         <th>Due</th>
                                         <th>Past Due</th>
@@ -131,6 +137,7 @@
                                         <td>{{ rentBill.gas_bill }}</td>
                                         <td>{{ rentBill.electric_bill }}</td>
                                         <td>{{ rentBill.water_bill }}</td>
+                                        <td>{{ rentBill.garbase_bill }}</td>
                                         <td>{{ rentBill.grand_total }}</td>
                                         <td>{{ rentBill.due }}</td>
                                         <td>{{ rentBill.past_due }}</td>
@@ -185,6 +192,10 @@
                                                     <tr>
                                                         <th>Water Bill</th>
                                                         <td>{{ selectedRentBill?.water_bill }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Garbase Bill</th>
+                                                        <td>{{ selectedRentBill?.garbase_bill }}</td>
                                                     </tr>
                                                     <tr class="table-success">
                                                         <th>Grand Total</th>
@@ -265,6 +276,7 @@ export default {
                 gas_bill: '',
                 electric_bill: '',
                 water_bill: '',
+                garbase_bill: '',
             },
             rentBills: [],
             pagination: null,
@@ -386,13 +398,15 @@ export default {
                 garbase_bill: rentBill.garbase_bill,
                 payment: rentBill.payment,
                 due: rentBill.due,
+                past_due: rentBill.past_due,
                 water_bill: rentBill.water_bill,
+                due_payment: rentBill.due_payment,
                 note: rentBill.note
             };
             if (!this.showForm) this.toggleForm();
         },
         resetForm() {
-            this.form = { user_id: '', month: '', flat_rent: '', gas_bill: '', electric_bill: '', water_bill: '', };
+            this.form = { user_id: '', month: '', flat_rent: '', gas_bill: '', electric_bill: '', water_bill: '', garbase_bill: '' };
             this.isEditing = false;
             this.currentrentBillId = null;
             this.errors = [];
